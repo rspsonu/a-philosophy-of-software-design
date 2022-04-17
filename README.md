@@ -36,8 +36,55 @@ Tactical Programming refers to the approach of programming where you're just wri
 
 It seems reasonable to add a bit of complexity if it allows the current task to be completed more quickly. But as is the nature of software, the accumulation of complexity is incremental. It’s not one particular thing that makes a system complicated, but the accumulation of dozens or hundreds of small things. And the complexity is going to increase rapidly if everyone is programming tactically.
 
-### Strategic programming
+### Strategic Programming
 
 The first step towards becoming a good software designer is to realize that working code isn’t enough. It’s not acceptable to introduce unnecessary complexities in order to finish your current task faster. The most important thing is the long-term structure of the system. Most of the code in any system is written by extending the existing code base, so your most important job as a developer is to facilitate those future extensions. Thus, you should not think of “working code” as your primary goal, though of course your code must work. Your primary goal must be to produce a great design, which also happens to work. This is strategic programming.
 
 Strategic programming requires an investment mindset. Rather than taking the fastest path to finish your current project, you must  invest time to improve the design of the system. These investments will slow you down a bit in the short term, but they will speed you up in the long term.
+
+## Modules Should Be Deep
+
+### Modular Design
+In modular design, a software system is decomposed into a collection of modules that are relatively independent. Modules can take many forms, such as classes, subsystems, or services. In an ideal world, modules would be ccompletely independent of each other. In this world, the complexity of a system would be the complexity of its worst module.
+
+Unfortunately, this ideal is not achievable. Modules must work together by calling each others’s functions or methods. As a result, modules must know something about each other. For example, the arguments for a method create a dependency between the method and any code that invokes the method. If the required arguments change, all  invocations of the method must be modified to conform to the new signature. Dependencies can take many other forms,
+and they can be quite subtle. The goal of modular design is to minimize the dependencies between modules.
+
+In order to manage dependencies, we think of each module in two parts: an _interface_ and an _implementation_. The interface consists of everything that a developer working in a different module must know in order to use the given module. Typically, the interface describes what the module does but not how it does it. The implementation consists of the code that carries out the promises made by the interface. A developer working in a particular module must understand the interface and implementation of that module, plus the interfaces of any other modules invoked by the given module. A developer should not need to understand the implementations of modules other than the one he or she is working in.
+
+> **For the purposes of this book, a module is any unit of code that has an interface and an implementation.**
+
+The best modules are those whose interfaces are much simpler than their implementations. Such modules have two advantages. First, a simple interface minimizes the complexity that a module imposes on the rest of the system. Second, if a module is modified in a way that does not change its interface, then no other module will be affected by the modification. If a module’s interface is much simpler than its implementation, there will be many aspects of the module that can be changed without affecting other modules.
+
+### What’s in an interface?
+
+The interface to a module contains two kinds of information: _formal_ and _informal_. The formal parts of an interface are specified  explicitly in the code. For example, the formal interface for a method is its signature, which includes the names and types of its parameters, the type of its return value, and information about exceptions thrown by the method.
+
+Each interface also includes informal elements. These are not specified in a way that can be understood or enforced by the programming language. The informal parts of an interface include its high-level behavior, such as the fact that a function deletes the file named by one of its arguments. If there are constraints on the usage of a class (perhaps one method must be called before another), these are also part of the class’s interface. In general,
+if a developer needs to know a particular piece of information in order to use a module, then that information is part of the module’s interface. The informal aspects of an interface can only be described using comments, and the programming language cannot ensure that the description is complete or accurate. For most interfaces the informal aspects are larger and more complex than the formal aspects.
+
+### Abstractions
+
+> **An abstraction is a simplified view of an entity, which omits unimportant details.**
+
+In modular programming, each module provides an abstraction in form of its interface. The interface presents a simplified view of the  module’s functionality; the details of the implementation are  unimportant from the standpoint of the module’s abstraction, so they are omitted from the interface.
+
+In the definition of abstraction, the word “unimportant” is crucial. The more unimportant details that are omitted from an abstraction, the better. However, a detail can only be omitted from an abstraction if it is unimportant. An abstraction can go wrong in two ways. First, it can include details that are not really  important; when this happens, it makes the abstraction more  complicated than necessary, which increases the cognitive load on developers using the abstraction. The second error is when an abstraction omits details that really are important. This results in obscurity: developers looking only at the abstraction will not have all the information they need to use the abstraction  correctly. An abstraction that omits important details is a false abstraction: it might appear simple, but in reality it isn’t. The key to designing abstractions is to understand what is important, and to look for designs that minimize the amount of information that is important.
+
+## Deep Modules
+
+> **Deep modules are those that provide powerful functionality yet have simple interfaces.**
+
+To visualize the notion of depth, imagine that each module is represented by a rectangle, as shown in the figure below. The area of each rectangle is proportional to the functionality implemented by the module. The top edge of a rectangle represents the module’s interface; the length of that edge indicates the complexity of the interface. The best modules are deep: they have a lot of functionality hidden behind a simple interface. A deep module is a good abstraction because only a small fraction of its internal complexity is visible to its users.
+
+![Deep and Shallow Modules](/images/deep-and-shallow-modules.PNG "Deep and Shallow Modules")
+
+Module depth is a way of thinking about cost versus benefit. The benefit provided by a module is its functionality. The cost of a module (in terms of system complexity) is its interface. A module’s interface represents the complexity that the module imposes on the rest of the system: the smaller and simpler the interface, the less complexity that it introduces. The best modules are those with the greatest benefit and the least cost. Interfaces are good, but more, or larger, interfaces are not necessarily better!
+
+## Shallow modules
+
+> A shallow module is one whose interface is complicated relative to the functionality it provides. Shallow modules don’t help much in the battle against complexity, because the benefit they provide (not having to learn about how they work internally) is negated by the cost of learning and using their interfaces. Small modules tend to be shallow.
+
+## Conclusion
+
+A shallow module is one whose interface is complicated relative to the functionality it provides. Shallow modules don’t help much in the battle against complexity, because the benefit they provide (not having to learn about how they work internally) is negated by the cost of learning and using their interfaces. Small modules tend to be shallow.
